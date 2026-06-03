@@ -3,11 +3,14 @@ package com.example.cocktails.data.repository
 import com.example.cocktails.data.retrofit.DrinkDetailsDto
 import com.example.cocktails.data.service.CocktailsApiService
 import com.example.cocktails.data.retrofit.DrinkDetailsDvo
+import com.example.cocktails.data.retrofit.DrinkDto
 import com.example.cocktails.data.retrofit.DrinkDvo
+import com.example.cocktails.data.retrofit.IngredientDetailsDto
+import com.example.cocktails.data.retrofit.IngredientDetailsDvo
 import com.example.cocktails.data.toDvo
 import com.example.cocktails.data.toDvoList
 
-class CocktailsRetrofitRepository(private val api: CocktailsApiService): CocktailsRepository {
+class CocktailsRetrofitRepository(private val api: CocktailsApiService) : CocktailsRepository {
     override suspend fun getAlcoGridInfo(): List<DrinkDvo> {
         val response = api.getGrid("Alcoholic")
 
@@ -24,12 +27,25 @@ class CocktailsRetrofitRepository(private val api: CocktailsApiService): Cocktai
         val response = api.getDetail(id)
 
         val singleDrinkDto: DrinkDetailsDto = response.drinks?.firstOrNull()
-            ?: throw Exception("Сервер нічого не знайшов")
+            ?: throw Exception("The server found nothing")
 
         return singleDrinkDto.toDvo()
     }
 
-//    override suspend fun getIngredients(): List<DetailInfo> {
-//        TODO("Not yet implemented")
-//    }
+    override suspend fun getAllDrinkByIngredient(id: String): DrinkDvo {
+        val response = api.getCocktailsByIngredient(id)
+        val singleDrink: DrinkDto =
+            response.drinks.firstOrNull() ?: throw Exception("The server found nothing")
+        return singleDrink.toDvo()
+    }
+
+    override suspend fun getIngredient(id: String): IngredientDetailsDvo {
+
+        val response = api.getIngredient(id)
+
+        val singleIngredient: IngredientDetailsDto =
+            response.ingredients?.firstOrNull() ?: throw Exception("The server found nothing")
+
+        return singleIngredient.toDvo()
+    }
 }

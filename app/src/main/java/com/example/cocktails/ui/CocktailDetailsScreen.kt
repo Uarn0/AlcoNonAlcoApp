@@ -64,47 +64,66 @@ fun CocktailDetailsScreen(vm: CocktailsViewModel, onIngredientClick: (String) ->
             Text("${details?.instruction}", style = MaterialTheme.typography.bodyLarge)
         }
 
-        item {
-
-        }
-
         item{
             Text("Ingredients:")
             if (details != null) {
-                IngredientCard(details)
-            }
-        }
-
-    }
-}
+                val ingredients = details.ingredients
 
 
-
-@Composable
-private fun IngredientCard(details: DrinkDetailsDvo) {
-
-    val ingredients = details.ingredients
-
-
-    LazyRow(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        items(ingredients) { ingredient ->
-            Card(modifier = Modifier
-                .fillMaxSize()
-                .clickable { }
-                .padding(5.dp),
-                border = BorderStroke(.5.dp, Color.Black),
-                shape = RoundedCornerShape(0.dp)) {
-                Column {
-                    AsyncImage(
-                        model = ingredient.imageUrl,
-                        contentDescription = "image of ${ingredient.name}"
-                    )
-                    Text(ingredient.name)
-                    Text(ingredient.measure)
+                LazyRow(
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    items(ingredients) { ingredient ->
+                        Card(modifier = Modifier
+                            .fillMaxSize()
+                            .clickable { onIngredientClick(ingredient.name) }
+                            .padding(5.dp),
+                            border = BorderStroke(.5.dp, Color.Black),
+                            shape = RoundedCornerShape(0.dp)) {
+                            Column {
+                                AsyncImage(
+                                    model = ingredient.imageUrl,
+                                    contentDescription = "image of ${ingredient.name}"
+                                )
+                                Text(ingredient.name)
+                                Text(ingredient.measure)
+                            }
+                        }
+                    }
                 }
             }
         }
+
     }
 }
+
+//
+//
+//@Composable
+//private fun IngredientCard(details: DrinkDetailsDvo,  onClick: (String) -> Unit) {
+//
+//    val ingredients = details.ingredients
+//
+//
+//    LazyRow(
+//        modifier = Modifier.fillMaxSize()
+//    ) {
+//        items(ingredients) { ingredient ->
+//            Card(modifier = Modifier
+//                .fillMaxSize()
+//                .clickable { onClick(ingredient.name) }
+//                .padding(5.dp),
+//                border = BorderStroke(.5.dp, Color.Black),
+//                shape = RoundedCornerShape(0.dp)) {
+//                Column {
+//                    AsyncImage(
+//                        model = ingredient.imageUrl,
+//                        contentDescription = "image of ${ingredient.name}"
+//                    )
+//                    Text(ingredient.name)
+//                    Text(ingredient.measure)
+//                }
+//            }
+//        }
+//    }
+//}

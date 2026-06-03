@@ -2,6 +2,7 @@ package com.example.cocktails.data.service
 
 import com.example.cocktails.data.retrofit.DrinkDetailsResponseDto
 import com.example.cocktails.data.retrofit.DrinksDto
+import com.example.cocktails.data.retrofit.IngredientResponseDto
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
@@ -28,7 +29,10 @@ interface CocktailsApiService {
 
 
     @GET("filter.php")
-    suspend fun getCocktailsByIngredient(@Query("i") name: String):
+    suspend fun getCocktailsByIngredient(@Query("i") name: String): DrinksDto
+
+    @GET("search.php")
+    suspend fun getIngredient(@Query("i") id: String): IngredientResponseDto
 }
 
 object RetrofitInstance {

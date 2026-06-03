@@ -22,6 +22,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.cocktails.CocktailsIntent
 import com.example.cocktails.ui.AlcoholicScreen
 import com.example.cocktails.ui.CocktailDetailsScreen
+import com.example.cocktails.ui.IngredientDetailsScreen
 import com.example.cocktails.ui.NonAlcoholicScreen
 import com.example.cocktails.ui.Screens
 import com.example.cocktails.viewmodel.CocktailsViewModel
@@ -91,16 +92,18 @@ fun BottomNavigationBar(viewModel: CocktailsViewModel) {
 
                 CocktailDetailsScreen(
                     vm = viewModel,
-                    onIngredientClick = { id -> viewModel.onIntent(CocktailsIntent.Ingredient(id)) }
+                    onIngredientClick = { id -> navController.navigate("${Screens.Ingredient.route}/$id") }
                 )
             }
 
-            composable("${Screens.Ingredient.route}/name") {backStackEntry ->
+            composable("${Screens.Ingredient.route}/{name}") {backStackEntry ->
                 val ingredientId = backStackEntry.arguments?.getString("name")?: return@composable
 
                 LaunchedEffect(key1 = ingredientId) {
                     viewModel.onIntent((CocktailsIntent.Ingredient(ingredientId)))
                 }
+
+                IngredientDetailsScreen(viewModel)
             }
 
         }

@@ -4,6 +4,8 @@ import com.example.cocktails.data.retrofit.DrinkDetailsDto
 import com.example.cocktails.data.retrofit.DrinkDetailsDvo
 import com.example.cocktails.data.retrofit.DrinkDto
 import com.example.cocktails.data.retrofit.DrinkDvo
+import com.example.cocktails.data.retrofit.IngredientDetailsDto
+import com.example.cocktails.data.retrofit.IngredientDetailsDvo
 import com.example.cocktails.data.retrofit.IngredientItem
 
 fun DrinkDto.toDvo(): DrinkDvo {
@@ -18,7 +20,7 @@ fun List<DrinkDto>.toDvoList(): List<DrinkDvo> {
     return this.map { it.toDvo() }
 }
 
-fun DrinkDetailsDto.toDvo(): DrinkDetailsDvo{
+fun DrinkDetailsDto.toDvo(): DrinkDetailsDvo {
 
     val ingredients = listOfNotNull(
         strIngredient1, strIngredient2, strIngredient3, strIngredient4, strIngredient5,
@@ -41,5 +43,13 @@ fun DrinkDetailsDto.toDvo(): DrinkDetailsDvo{
         instruction = this.strInstructions,
         imageUrl = this.strDrinkThumb,
         ingredients = pairedIngredients
+    )
+}
+
+fun IngredientDetailsDto.toDvo(): IngredientDetailsDvo {
+    return IngredientDetailsDvo(
+        name = this.strIngredient,
+        id = this.idIngredient,
+        description = this.strDescription,
     )
 }

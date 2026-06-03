@@ -11,9 +11,6 @@ import com.example.cocktails.CocktailApplication
 import com.example.cocktails.CocktailsIntent
 import com.example.cocktails.CocktailsUiState
 import com.example.cocktails.data.repository.CocktailsRetrofitRepository
-import com.example.cocktails.data.retrofit.AboutIngredientDto
-import com.example.cocktails.data.service.RetrofitInstance
-import com.example.cocktails.data.toDvo
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -38,54 +35,54 @@ class CocktailsViewModel(
         Log.e("API", "Loaded")
     }
 
-    private fun copyToBuffer(ingredients: AboutIngredientDto) {
-        TODO("Not yet implemented")
-    }
-
-    private fun seeInstruction() {
-
-    }
-
     private fun getIngredient(ingredient: String) {
+        viewModelScope.launch {
+            val loadedAllDrinks = drinkRepository.getAllDrinkByIngredient(ingredient)
+            val ingredient = drinkRepository.getIngredient(ingredient)
 
+            _uiState.update {
+                _uiState.value.copy(
+                    allTypeDrinks = loadedAllDrinks,
+                    ingredient = ingredient
+                )
+            }
+            Log.e("WTF", "$loadedAllDrinks")
+        }
     }
 
     private fun getDetail(idDrink: String) {
         viewModelScope.launch {
-            try {
-                val response = RetrofitInstance.api.getDetail(idDrink)
 
-                val drinkDetailsDvo = response.drinks?.firstOrNull()?.toDvo()
+            val drinkDetailsDvo = drinkRepository.getDetails(idDrink)
 
-                if (drinkDetailsDvo != null) {
-                    _uiState.update { it.copy(details = drinkDetailsDvo) }
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
+            _uiState.update { it.copy(details = drinkDetailsDvo) }
         }
     }
 
 
     fun loadCocktails() {
         viewModelScope.launch {
-            try {
-                val loadedAlco = drinkRepository.getAlcoGridInfo()
-                val loadedNonAlco = drinkRepository.getNonAlcoGridInfo()
+            val loadedAlco = drinkRepository.getAlcoGridInfo()
+            val loadedNonAlco = drinkRepository.getNonAlcoGridInfo()
 
-                _uiState.value = _uiState.value.copy(
-                    drinkAlco = loadedAlco,
-                    drinksNonAlco = loadedNonAlco
-                )
-                _uiState.value = _uiState.value.copy(
-                    uiIsReady = false
-                )
-
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
+            _uiState.value = _uiState.value.copy(
+                drinkAlco = loadedAlco,
+                drinksNonAlco = loadedNonAlco
+            )
+            _uiState.value = _uiState.value.copy(
+                uiIsReady = false
+            )
         }
     }
+
+//    fun loadAllCocktails() {
+//        viewModelScope.launch {
+//            try {
+//                val allDrinks = _uiState.value.allTypeDrinks
+//                _uiState
+//            }
+//        }
+//    }
 
     companion object {
         val Factory: ViewModelProvider.Factory = viewModelFactory {
