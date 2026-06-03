@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
+import com.example.cocktails.ui.navigation.BottomNavigationBar
 import com.example.cocktails.ui.theme.CocktailsTheme
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -36,5 +37,5 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun AllUI(modifier: Modifier) {
-
+    BottomNavigationBar()
 }
