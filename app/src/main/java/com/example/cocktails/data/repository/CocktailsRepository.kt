@@ -1,12 +1,14 @@
 package com.example.cocktails.data.repository
 
-import com.example.cocktails.data.retrofit.DetailInfo
-import com.example.cocktails.data.retrofit.GridInfo
-import com.example.cocktails.data.retrofit.InstructionInfo
-import kotlinx.coroutines.flow.Flow
+import com.example.cocktails.data.retrofit.DrinkDetailsDvo
+import com.example.cocktails.data.retrofit.DrinkDto
+import com.example.cocktails.data.retrofit.DrinkDvo
 
 interface CocktailsRepository {
-    fun getGridInfo(): Flow<List<GridInfo>>
-    fun getIngredients(): Flow<List<DetailInfo>>
-    fun getInstruction(): Flow<InstructionInfo>
+    suspend fun getAlcoGridInfo(): List<DrinkDvo>
+    suspend fun getNonAlcoGridInfo(): List<DrinkDvo>
+    suspend fun getDetails(id: String): DrinkDetailsDvo
 }
+
+
+//https://www.thecocktaildb.com/images/ingredients/Brown Sugar.png

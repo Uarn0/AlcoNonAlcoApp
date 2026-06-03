@@ -1,7 +1,7 @@
 package com.example.cocktails.data.retrofit
 
-data class GridInfo(
+data class DrinkDvo(
     val name: String,
-    val id: Int,
-    val image: String
+    val imageUrl: String,
+    val id: String
 )
