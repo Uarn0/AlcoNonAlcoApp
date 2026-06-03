@@ -84,7 +84,7 @@ class CocktailsViewModel(
                     )
                 }
             } catch (e: Exception) {
-                Log.e("RANDOM", "Error: ${e.message}")
+                Log.e("RANDOFM", "Error: ${e.message}")
                 _uiState.update {
                     it.copy(isDetailsLoading = false, detailsError = e.message)
                 }
