@@ -18,6 +18,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
@@ -31,11 +32,13 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.cocktails.CocktailsIntent
+import com.example.cocktails.ExpandableActionMenu
 import com.example.cocktails.ui.AlcoholicScreen
 import com.example.cocktails.ui.CocktailDetailsScreen
 import com.example.cocktails.ui.IngredientDetailsScreen
 import com.example.cocktails.ui.NonAlcoholicScreen
 import com.example.cocktails.ui.Screens
+import com.example.cocktails.ui.SearchBar
 import com.example.cocktails.viewmodel.CocktailsViewModel
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -45,9 +48,39 @@ fun BottomNavigationBar(viewModel: CocktailsViewModel) {
     var navigationSelectedItem by remember { mutableIntStateOf(0) }
 
     val navController = rememberNavController()
+    val state by viewModel.uiState.collectAsState()
+    LaunchedEffect(state.navigateToDetails) {
+        if (state.isRandomNavigation && state.navigateToDetails != null) {
+            navController.navigate("${Screens.Details.route}/${state.navigateToDetails}")
+            viewModel.onIntent(CocktailsIntent.ClearNavigation)
+        }
+    }
 
+    Scaffold(modifier = Modifier.fillMaxSize(), floatingActionButton = {
+        ExpandableActionMenu(
 
-    Scaffold(modifier = Modifier.fillMaxSize(), bottomBar = {
+            onRandomClick = { viewModel.onIntent(CocktailsIntent.RandomDrink) },
+            onSearchClick = {
+                viewModel.onIntent(CocktailsIntent.ToggleSearch)
+            }
+        )
+    }, topBar = {
+        if (state.isSearchActive) {
+            SearchBar(
+                query = state.searchQuery,
+                onQueryChange = { viewModel.onIntent(CocktailsIntent.SearchDrink(it)) },
+                onClose = { viewModel.onIntent(CocktailsIntent.ClearSearch) },
+                isLoading = state.isSearchLoading,
+                results = state.searchResults,
+                onResultClick = { drinkId ->
+                    viewModel.onIntent(CocktailsIntent.ClearSearch)
+                    viewModel.onIntent(CocktailsIntent.Details(drinkId))
+                    navController.navigate("${Screens.Details.route}/$drinkId")
+                }
+            )
+        }
+    }, bottomBar = {
+
         NavigationBar {
             BottomNavigationItem().bottomNavigationItems().forEachIndexed { index, item ->
                 NavigationBarItem(
@@ -76,7 +109,8 @@ fun BottomNavigationBar(viewModel: CocktailsViewModel) {
                 )
             }
         }
-    }) {paddingValues ->
+    }) { paddingValues ->
+
         SharedTransitionLayout {
             NavHost(
                 navController = navController,
@@ -87,54 +121,59 @@ fun BottomNavigationBar(viewModel: CocktailsViewModel) {
                 popEnterTransition = { EnterTransition.None },
                 popExitTransition = { ExitTransition.None }
             ) {
+
                 composable(
                     Screens.Alcoholic.route,
-                    enterTransition = { fadeIn(animationSpec = tween(300)) },
+                    enterTransition = { fadeIn(animationSpec = tween(6000)) },
                     exitTransition = { fadeOut(animationSpec = tween(300)) },
-                    popEnterTransition = { fadeIn(animationSpec = tween(300)) },
+                    popEnterTransition = { fadeIn(animationSpec = tween(600)) },
                     popExitTransition = { fadeOut(animationSpec = tween(300)) }
                 ) {
+
                     AlcoholicScreen(
                         sharedTransitionScope = this@SharedTransitionLayout,
                         animatedVisibilityScope = this@composable,
                         vm = viewModel,
                         onCocktailClick = { cocktailId ->
-                            navController.navigate("${Screens.Details.route}/$cocktailId/alco")
+                            navController.navigate("${Screens.Details.route}/$cocktailId")
                         }
                     )
                 }
 
                 composable(
                     Screens.NonAlcoholic.route,
-                    enterTransition = { fadeIn(animationSpec = tween(300)) },
+                    enterTransition = { fadeIn(animationSpec = tween(600)) },
                     exitTransition = { fadeOut(animationSpec = tween(300)) },
-                    popEnterTransition = { fadeIn(animationSpec = tween(300)) },
+                    popEnterTransition = { fadeIn(animationSpec = tween(600)) },
                     popExitTransition = { fadeOut(animationSpec = tween(300)) }
                 ) {
+
                     NonAlcoholicScreen(
                         sharedTransitionScope = this@SharedTransitionLayout,
                         animatedVisibilityScope = this@composable,
                         vm = viewModel,
                         onCocktailClick = { cocktailId ->
-                            navController.navigate("${Screens.Details.route}/$cocktailId/nonalco")
+                            navController.navigate("${Screens.Details.route}/$cocktailId")
                         },
                     )
                 }
 
                 composable(
-                    "${Screens.Details.route}/{id}/{type}",
-                    enterTransition = { fadeIn(animationSpec = tween(300)) },
+                    "${Screens.Details.route}/{id}",
+                    enterTransition = { fadeIn(animationSpec = tween(600)) },
                     exitTransition = { fadeOut(animationSpec = tween(300)) },
-                    popEnterTransition = { fadeIn(animationSpec = tween(300)) },
+                    popEnterTransition = { fadeIn(animationSpec = tween(600)) },
                     popExitTransition = { fadeOut(animationSpec = tween(300)) }
                 ) { backStackEntry ->
                     val cocktailId = backStackEntry.arguments?.getString("id") ?: return@composable
+
                     LaunchedEffect(key1 = cocktailId) {
                         viewModel.onIntent(CocktailsIntent.Details(cocktailId))
                     }
 
                     CocktailDetailsScreen(
                         vm = viewModel,
+                        drink = cocktailId,
                         onIngredientClick = { id -> navController.navigate("${Screens.Ingredient.route}/$id") },
                         sharedTransitionScope = this@SharedTransitionLayout,
                         animatedVisibilityScope = this@composable,
@@ -148,7 +187,8 @@ fun BottomNavigationBar(viewModel: CocktailsViewModel) {
                     popEnterTransition = { fadeIn(animationSpec = tween(1500)) },
                     popExitTransition = { fadeOut(animationSpec = tween(300)) }
                 ) { backStackEntry ->
-                    val passedName = backStackEntry.arguments?.getString("name") ?: return@composable
+                    val passedName =
+                        backStackEntry.arguments?.getString("name") ?: return@composable
 
                     LaunchedEffect(key1 = passedName) {
                         viewModel.onIntent((CocktailsIntent.Ingredient(passedName)))
@@ -158,7 +198,8 @@ fun BottomNavigationBar(viewModel: CocktailsViewModel) {
                         viewModel,
                         passedIngredientName = passedName,
                         sharedTransitionScope = this@SharedTransitionLayout,
-                        animatedVisibilityScope = this@composable,)
+                        animatedVisibilityScope = this@composable,
+                    )
                 }
 
             }

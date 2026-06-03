@@ -22,6 +22,9 @@ interface CocktailsApiService {
     @GET("filter.php")
     suspend fun getGrid(@Query("a") drinkType: String): DrinksDto
 
+    @GET("random.php")
+    suspend fun getRandomDrink() : DrinkDetailsResponseDto
+
     @GET("lookup.php")
     suspend fun getDetail(
         @Query("i") id: String,
@@ -33,6 +36,9 @@ interface CocktailsApiService {
 
     @GET("search.php")
     suspend fun getIngredient(@Query("i") id: String): IngredientResponseDto
+
+    @GET("search.php")
+    suspend fun searchCocktails(@Query("s") query: String): DrinksDto
 }
 
 object RetrofitInstance {

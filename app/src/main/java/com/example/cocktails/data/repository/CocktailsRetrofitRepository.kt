@@ -48,4 +48,20 @@ class CocktailsRetrofitRepository(private val api: CocktailsApiService) : Cockta
 
         return singleIngredient.toDvo()
     }
+
+
+
+    override suspend fun getRandomDrink(): DrinkDetailsDvo {
+        val response = api.getRandomDrink()
+
+        val singleRandomDrinkDto: DrinkDetailsDto = response.drinks?.firstOrNull()
+            ?: throw Exception("The server found nothing")
+
+        return singleRandomDrinkDto.toDvo()
+    }
+
+    override suspend fun searchCocktails(query: String): List<DrinkDvo> {
+        val response = api.searchCocktails(query)
+        return response.drinks.map { it.toDvo() }
+    }
 }

@@ -11,4 +11,8 @@ interface CocktailsRepository {
     suspend fun getAllDrinkByIngredient(id : String): DrinkDvo
 
     suspend fun getIngredient(id: String): IngredientDetailsDvo
+
+    suspend fun getRandomDrink(): DrinkDetailsDvo
+
+    suspend fun searchCocktails(query: String): List<DrinkDvo>
 }
