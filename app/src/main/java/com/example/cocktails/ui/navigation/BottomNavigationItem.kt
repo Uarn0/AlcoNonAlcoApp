@@ -1,26 +1,23 @@
 package com.example.cocktails.ui.navigation
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Circle
-import androidx.compose.material.icons.filled.Square
-import androidx.compose.ui.graphics.vector.ImageVector
+import com.example.cocktails.R
 import com.example.cocktails.ui.Screens
 
 data class BottomNavigationItem(
     val label: String = "",
-    val icon: ImageVector = Icons.Filled.Circle,
+    val icon: Int = R.drawable.alco,
     val route: String = ""
 ) {
     fun bottomNavigationItems() : List<BottomNavigationItem>{
         return listOf(
             BottomNavigationItem(
                 label = "Alcoholic",
-                icon = Icons.Filled.Circle,
+                icon = R.drawable.alco,
                 route = Screens.Alcoholic.route
             ),
             BottomNavigationItem(
                 label = "Non Alcoholic",
-                icon = Icons.Filled.Square,
+                icon = R.drawable.noalco,
                 route = Screens.NonAlcoholic.route
             )
         )

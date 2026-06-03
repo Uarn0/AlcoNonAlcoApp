@@ -36,7 +36,7 @@ class MainActivity : ComponentActivity() {
                 -splashScreenView.view.height.toFloat()
             )
             slideUp.interpolator = AnticipateInterpolator()
-            slideUp.duration = 200L
+            slideUp.duration = 600L
 
             slideUp.doOnEnd { splashScreenView.remove() }
             slideUp.start()
@@ -46,7 +46,6 @@ class MainActivity : ComponentActivity() {
         setContent {
             CocktailsTheme {
                 AllUI(
-                    modifier = Modifier.systemBarsPadding(),
                     viewModel = viewModel
                 )
             }

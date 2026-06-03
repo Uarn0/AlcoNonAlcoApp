@@ -4,6 +4,7 @@ coilCompose = "2.7.0"
 converterGson = "3.0.0"
 coreKtx = "1.10.1"
 coreSplashscreen = "1.2.0"
+foundationLayout = "1.11.2"
 junit = "4.13.2"
 junitVersion = "1.1.5"
 espressoCore = "3.5.1"
@@ -18,6 +19,7 @@ okhttp = "5.3.2"
 retrofit = "3.0.0"
 
 [libraries]
+androidx-compose-foundation-layout = { module = "androidx.compose.foundation:foundation-layout", version.ref = "foundationLayout" }
 androidx-compose-material-icons-extended = { module = "androidx.compose.material:material-icons-extended" }
 androidx-compose-material3-adaptive-navigation-suite = { module = "androidx.compose.material3:material3-adaptive-navigation-suite", version.ref = "material3AdaptiveNavigationSuite" }
 androidx-compose-material3-window-size-class1 = { module = "androidx.compose.material3:material3-window-size-class", version.ref = "material3" }

@@ -11,6 +11,7 @@ import com.example.cocktails.CocktailApplication
 import com.example.cocktails.CocktailsIntent
 import com.example.cocktails.CocktailsUiState
 import com.example.cocktails.data.repository.CocktailsRetrofitRepository
+import com.example.cocktails.data.retrofit.DrinkDvo
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -22,7 +23,6 @@ class CocktailsViewModel(
 
     private val _uiState = MutableStateFlow(CocktailsUiState())
     val uiState = _uiState.asStateFlow()
-
     fun onIntent(intent: CocktailsIntent) {
         when (intent) {
             is CocktailsIntent.Details -> getDetail(intent.idDrink)
@@ -50,11 +50,19 @@ class CocktailsViewModel(
         }
     }
 
+    private val _selectedBasicDrink = MutableStateFlow<DrinkDvo?>(null)
+    val selectedBasicDrink = _selectedBasicDrink.asStateFlow()
+
     private fun getDetail(idDrink: String) {
+        val basicDrink = _uiState.value.drinkAlco.find { it.id == idDrink }
+            ?: _uiState.value.drinksNonAlco.find { it.id == idDrink }
+
+        _selectedBasicDrink.value = basicDrink
+
+        _uiState.update { it.copy(details = null) }
+
         viewModelScope.launch {
-
             val drinkDetailsDvo = drinkRepository.getDetails(idDrink)
-
             _uiState.update { it.copy(details = drinkDetailsDvo) }
         }
     }
