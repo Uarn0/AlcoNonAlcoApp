@@ -1,6 +1,13 @@
 package com.example.cocktails.viewmodel
 
+import android.Manifest
+import android.app.Application
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.Network
 import android.util.Log
+import androidx.annotation.RequiresPermission
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
@@ -13,6 +20,8 @@ import com.example.cocktails.CocktailsUiState
 import com.example.cocktails.data.repository.CocktailsRetrofitRepository
 import com.example.cocktails.data.retrofit.DrinkDvo
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.debounce
@@ -29,35 +38,32 @@ class CocktailsViewModel(
     val uiState = _uiState.asStateFlow()
     fun onIntent(intent: CocktailsIntent) {
         when (intent) {
-            is CocktailsIntent.Details -> {
+            is CocktailsIntent.Details ->
                 getDetail(intent.idDrink)
-            }
 
-            is CocktailsIntent.Ingredient -> {
+            is CocktailsIntent.Ingredient ->
                 getIngredient(intent.ingredient)
-            }
 
-            CocktailsIntent.LoadCocktails -> {
+            CocktailsIntent.LoadCocktails ->
                 loadCocktails()
-            }
 
-            CocktailsIntent.RandomDrink -> {
+            CocktailsIntent.RandomDrink ->
                 getRandomDrink()
-            }
 
-            is CocktailsIntent.SearchDrink -> {
+            is CocktailsIntent.SearchDrink ->
                 searching(intent.drinkName)
-            }
 
             CocktailsIntent.ClearNavigation -> _uiState.update {
                 it.copy(navigateToDetails = null, isRandomNavigation = false)
             }
             CocktailsIntent.ToggleSearch -> _uiState.update {
-                it.copy(isSearchActive = !it.isSearchActive, searchResults = emptyList(), searchQuery = "")
+                it.copy(isSearchActive = !it.isSearchActive,
+                    searchResults = emptyList(), searchQuery = "")
             }
 
             CocktailsIntent.ClearSearch -> _uiState.update {
-                it.copy(isSearchActive = false, searchResults = emptyList(), searchQuery = "")
+                it.copy(isSearchActive = false,
+                    searchResults = emptyList(), searchQuery = "")
             }
         }
     }
@@ -169,19 +175,23 @@ class CocktailsViewModel(
         viewModelScope.launch {
             _uiState.update { it.copy(isHomeLoading = true, homeError = null) }
             try {
-                val loadedAlco = drinkRepository.getAlcoGridInfo()
-                val loadedNonAlco = drinkRepository.getNonAlcoGridInfo()
-                _uiState.update {
-                    it.copy(
-                        isHomeLoading = false,
-                        drinkAlco = loadedAlco,
-                        drinksNonAlco = loadedNonAlco,
-                        uiIsReady = false
-                    )
+                coroutineScope {
+                    val alcoDeferred    = async { drinkRepository.getAlcoGridInfo() }
+                    val nonAlcoDeferred = async { drinkRepository.getNonAlcoGridInfo() }
+                    _uiState.update {
+                        it.copy(
+                            isHomeLoading  = false,
+                            drinkAlco      = alcoDeferred.await(),
+                            drinksNonAlco  = nonAlcoDeferred.await(),
+                        )
+                    }
                 }
             } catch (e: Exception) {
                 _uiState.update {
-                    it.copy(isHomeLoading = false, homeError = "No Internet connection!")
+                    it.copy(
+                        isHomeLoading = false,
+                        homeError     = "No Internet connection!",
+                    )
                 }
             }
         }
@@ -191,7 +201,9 @@ class CocktailsViewModel(
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer {
                 val application = (this[APPLICATION_KEY] as CocktailApplication)
-                CocktailsViewModel(drinkRepository = application.cocktailRepo)
+                CocktailsViewModel(
+                    drinkRepository  = application.cocktailRepo
+                )
             }
         }
     }

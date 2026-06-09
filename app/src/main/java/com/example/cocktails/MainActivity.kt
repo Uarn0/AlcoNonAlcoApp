@@ -67,7 +67,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         splashScreen.setKeepOnScreenCondition {
-            !viewModel.uiState.value.uiIsReady
+            false
         }
 
         splashScreen.setOnExitAnimationListener { splashScreenView ->

@@ -12,8 +12,6 @@ data class CocktailsUiState(
     val details: DrinkDetailsDvo? = null,
     val ingredient: IngredientDetailsDvo? = null,
 
-    val uiIsReady: Boolean = true,
-
     val openedViaRandom: Boolean = false,
     val navigateToDetails: String? = null,
     val isRandomNavigation: Boolean = false,
